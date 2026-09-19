@@ -1,0 +1,57 @@
+# ===========================================================================
+# Fallback .htaccess
+# ===========================================================================
+# Use this ONLY if you cannot edit httpd.conf — for example on a shared campus
+# server where you have htdocs access but not the Apache configuration.
+#
+# Rename this file to  .htaccess  (with the leading dot, no .txt) and put it in
+#   C:\xampp\htdocs\smart-cafeteria\.htaccess
+#
+# It covers the SPA routing and caching. It does NOT cover the API proxy:
+# mod_proxy directives are not permitted in .htaccess on most configurations.
+# So with this approach you must also set the API URL explicitly before
+# building the frontend, in frontend/.env:
+#
+#     VITE_API_BASE=http://localhost:4000/api
+#     VITE_SOCKET_URL=http://localhost:4000
+#
+# and add http://localhost to CORS_ORIGIN in backend/.env. The browser then
+# talks to Node directly on port 4000 instead of through Apache.
+#
+# The httpd-smart-cafeteria.conf route is better where you can use it: one
+# origin, no CORS, and the API reachable from a phone on the same network
+# without any URL editing.
+# ===========================================================================
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /smart-cafeteria/
+
+    # Serve real files and directories as-is; hand everything else to the SPA.
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule . /smart-cafeteria/index.html [L]
+</IfModule>
+
+<IfModule mod_headers.c>
+    # Content-hashed assets can never go stale — cache them for a year.
+    <FilesMatch "\.[0-9a-zA-Z]{8,}\.(js|css|woff2?)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+
+    # These three must always be revalidated or a rebuild never reaches an
+    # installed PWA.
+    <FilesMatch "^(index\.html|sw\.js|manifest\.webmanifest)$">
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+    </FilesMatch>
+</IfModule>
+
+<IfModule mod_mime.c>
+    AddType application/manifest+json .webmanifest
+</IfModule>
+
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json application/manifest+json image/svg+xml
+</IfModule>
+
+Options -Indexes
