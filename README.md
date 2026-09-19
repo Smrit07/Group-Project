@@ -17,9 +17,8 @@ smart-cafeteria/
 
 - [x] Database schema (`database/schema.sql`)
 - [x] Backend API: auth, menu, counters, orders, queue, simulations (stubbed), reports
-- [ ] DES engine (Python/SimPy) — `/api/simulations` currently returns 503 until this exists;
-      `/api/queue` already works via a simple fallback estimator
-- [ ] Frontend (Svelte)
+- [x] DES engine (Python/SimPy) — `/api/simulations`
+- [x] Frontend (Svelte)
 
 ## Suggested commit sequence
 
