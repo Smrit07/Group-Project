@@ -1,0 +1,8 @@
+node_modules/
+.env
+**/__pycache__/
+*.pyc
+des-engine/.installed
+frontend/dist/
+deploy/*.log
+deploy/*.pid
