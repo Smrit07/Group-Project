@@ -1,0 +1,9 @@
+# Smart Cafeteria — DES engine
+# Install with:  pip install -r requirements.txt
+# Tested on Python 3.10 – 3.12 (Windows/XAMPP and Linux).
+
+simpy==4.1.1          # discrete-event simulation kernel (proposal s.2.2.1)
+Flask==3.0.3          # REST bridge the Express backend calls
+python-dotenv==1.0.1  # reads .env so parameters change without code edits
+PyMySQL==1.1.1        # pure-Python MySQL driver — no C compiler needed on Windows
+waitress==3.0.0       # production WSGI server that actually works on Windows
