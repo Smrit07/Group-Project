@@ -41,7 +41,7 @@ const TRANSITION_TIMESTAMPS = {
 // Placing an order
 // ---------------------------------------------------------------------------
 
-// POST /api/orders — a student places a pre-order (
+// POST /api/orders — a student places a pre-order (FR-06)
 // body: { items: [{ menuItemId, quantity }] }
 async function createOrder(req, res, next) {
   const { items } = req.body;
@@ -53,7 +53,8 @@ async function createOrder(req, res, next) {
     return res.status(400).json({ message: 'An order cannot contain more than 20 line items.' });
   }
 
-  // Normalise and validate quantities before opening a transaction, so a malformed request never holds a connection.
+  // Normalise and validate quantities before opening a transaction, so a
+  // malformed request never holds a connection.
   const normalised = [];
   for (const item of items) {
     const menuItemId = Number(item.menuItemId);

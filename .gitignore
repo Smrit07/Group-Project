@@ -6,3 +6,4 @@ des-engine/.installed
 frontend/dist/
 deploy/*.log
 deploy/*.pid
+.DS_Store
