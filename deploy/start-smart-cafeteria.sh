@@ -75,17 +75,30 @@ if [ ! -d "$ROOT/backend/node_modules" ]; then
   echo "  [..] Installing backend dependencies (first run only)..."
   (cd "$ROOT/backend" && npm install --no-audit --no-fund) || fail "npm install failed in backend/."
 fi
-
 if [ ! -f "$ROOT/backend/.env" ]; then
   echo "  [..] Creating backend/.env from the example."
   cp "$ROOT/backend/.env.example" "$ROOT/backend/.env"
-  echo "  [!] Edit backend/.env and set JWT_SECRET to a long random string"
-  echo "      before showing this to anyone outside your own machine."
+
+  GENERATED_SECRET="$(node -e "console.log(require('crypto').randomBytes(48).toString('hex'))" 2>/dev/null)"
+  if [ -n "$GENERATED_SECRET" ]; then
+    sed "s|^JWT_SECRET=.*|JWT_SECRET=$GENERATED_SECRET|" "$ROOT/backend/.env" > "$ROOT/backend/.env.tmp" \
+      && mv "$ROOT/backend/.env.tmp" "$ROOT/backend/.env"
+    echo "  [ok] Generated a random JWT_SECRET automatically."
+  else
+    echo "  [!] Could not auto-generate JWT_SECRET (node not found?)."
+    echo "      Edit backend/.env and set it to a long random string by hand."
+  fi
 fi
 
 if [ ! -f "$ROOT/des-engine/.env" ]; then
   cp "$ROOT/des-engine/.env.example" "$ROOT/des-engine/.env"
 fi
+
+if [ ! -f "$ROOT/frontend/.env" ]; then
+  echo "  [..] Creating frontend/.env from the example."
+  cp "$ROOT/frontend/.env.example" "$ROOT/frontend/.env"
+fi
+
 
 # A marker file rather than checking for a directory: pip installs into the
 # global (or venv) site-packages, so there is nothing local to look for.
