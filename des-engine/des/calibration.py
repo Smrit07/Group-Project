@@ -36,7 +36,7 @@ from .config import get_settings
 logger = logging.getLogger(__name__)
 
 try:
-    import pymysql  # pure-Python, no compiler needed on a Windows/XAMPP laptop
+    import pymysql  # pure-Python driver; no compiler needed
 
     _DRIVER_AVAILABLE = True
 except ImportError:  # pragma: no cover

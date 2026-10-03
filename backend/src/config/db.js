@@ -1,27 +1,25 @@
 // ---------------------------------------------------------------------------
-// MySQL connection pool (XAMPP).
+// MySQL connection pool.
 // ---------------------------------------------------------------------------
 // A pool rather than a single connection, so student, staff and admin requests
 // do not queue behind each other during the peak-hour load the whole project
 // is about (NFR-03).
 //
 // Beyond that, the two things this file adds are both about the same failure:
-// XAMPP's MySQL not being started. That is the single most common reason this
+// MySQL not being available. That is a common reason this
 // app appears "broken" on a fresh machine, and the default mysql2 behaviour is
 // to fail on the first query with ECONNREFUSED — an error that reaches the
 // browser as a generic 500 with no hint about what to do. So:
 //
 //   * verifyConnection() runs once at boot and prints an explicit, actionable
-//     message naming XAMPP's control panel.
+//     message with a Docker Compose health-check hint.
 //   * describeError() translates the handful of MySQL error codes that
 //     actually occur in this setup into instructions.
 // ---------------------------------------------------------------------------
 
 const mysql = require('mysql2/promise');
 
-// XAMPP ships MySQL on 3306 as root with an empty password. Those are the
-// defaults here so that a clone with no .env at all still connects on a
-// standard XAMPP install — the state most people will first run it in.
+// Compose overrides these connection values for the MySQL container.
 const config = {
   host: process.env.DB_HOST || '127.0.0.1',
   port: Number(process.env.DB_PORT || 3306),
@@ -60,26 +58,26 @@ function describeError(err) {
     case 'ECONNREFUSED':
       return (
         `Cannot reach MySQL at ${config.host}:${config.port}. ` +
-        'Open the XAMPP Control Panel and press Start next to MySQL.'
+        'Check that the MySQL container is running with docker compose ps.'
       );
     case 'ER_BAD_DB_ERROR':
       return (
         `The database "${config.database}" does not exist. Import database/schema.sql ` +
-        '(then seed.sql) via phpMyAdmin at http://localhost/phpmyadmin.'
+        '(then seed.sql) or recreate the database volume if this is a fresh setup.'
       );
     case 'ER_ACCESS_DENIED_ERROR':
       return (
-        `MySQL rejected the credentials for user "${config.user}". On a default XAMPP ` +
-        'install the user is root with an empty password — check backend/.env.'
+        `MySQL rejected the credentials for user "${config.user}". Check the database ` +
+        'credentials configured in the project-root .env file.'
       );
     case 'ER_NO_SUCH_TABLE':
       return (
         'A required table is missing. Run database/schema.sql on a fresh database, or ' +
-        'database/migration_2026_10_des.sql if you are upgrading an existing one.'
+        'database/not-for-docker-init/migration_2026_10_des.sql if upgrading an existing one.'
       );
     case 'PROTOCOL_CONNECTION_LOST':
     case 'ECONNRESET':
-      return 'The MySQL connection dropped — usually XAMPP restarting MySQL mid-request.';
+      return 'The MySQL connection dropped — check the MySQL container logs and health.';
     case 'ER_CON_COUNT_ERROR':
       return 'MySQL refused a new connection because it has hit max_connections.';
     default:
@@ -119,7 +117,7 @@ async function verifyConnection() {
         database: config.database,
         missingTables: missing,
         warning: missing.length
-          ? `Missing table(s): ${missing.join(', ')}. Run database/migration_2026_10_des.sql.`
+          ? `Missing table(s): ${missing.join(', ')}. Run database/not-for-docker-init/migration_2026_10_des.sql.`
           : null,
       };
     } finally {

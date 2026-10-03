@@ -2,17 +2,11 @@ import { defineConfig, loadEnv } from 'vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 
 // ---------------------------------------------------------------------------
-// Two deployment shapes have to work from one config.
+// The production build and development server share one config.
 // ---------------------------------------------------------------------------
 // 1. Development: `npm run dev` on port 5173, calling the Node API on 4000.
-// 2. XAMPP: `npm run build`, output copied into C:/xampp/htdocs/smart-cafeteria,
-//    served by Apache on port 80, which reverse-proxies /api and /socket.io
-//    through to Node.
-//
-// The thing that breaks shape 2 is `base`. Vite defaults to '/', so every asset
-// is requested from http://localhost/assets/... — which is the wrong folder
-// when the app lives in a htdocs subdirectory. Setting VITE_BASE_PATH to
-// '/smart-cafeteria/' makes the built index.html reference its own folder.
+// 2. Production: the frontend is built into the Node app image and served from
+//    the web root. VITE_BASE_PATH can be changed for a subpath deployment.
 //
 // In dev the proxy below means the frontend can call '/api/...' relative, the
 // same string it uses in production. Without it you need two different API base

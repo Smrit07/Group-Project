@@ -4,13 +4,80 @@ services:
     container_name: smart_cafeteria_mysql
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
       MYSQL_DATABASE: smart_cafeteria
+      MYSQL_USER: ${DB_USER:-}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-}
     ports:
-      - "3307:3306" # host:container — 3307 avoids clashing with XAMPP if it's still installed
+      - "3307:3306" # host:container — MySQL client access
     volumes:
       - cafeteria_db_data:/var/lib/mysql
-      - ./database:/docker-entrypoint-initdb.d # schema.sql + seed.sql run automatically on first start
+      - ./database:/docker-entrypoint-initdb.d:ro # schema.sql + seed.sql run on first start
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  adminer:
+    image: adminer:4
+    container_name: smart_cafeteria_adminer
+    restart: unless-stopped
+    environment:
+      ADMINER_DEFAULT_SERVER: mysql
+    ports:
+      - "127.0.0.1:${ADMINER_PORT:-8081}:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  des-engine:
+    build:
+      context: ./des-engine
+    container_name: smart_cafeteria_des
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5002:5001"
+    environment:
+      DES_HOST: 0.0.0.0
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: smart_cafeteria
+      DB_USER: ${DB_USER:-root}
+      DB_PASSWORD: ${DB_PASSWORD:-${MYSQL_ROOT_PASSWORD:-rootpassword}}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5001/health', timeout=2)"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: smart_cafeteria_app
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: smart_cafeteria
+      DB_USER: ${DB_USER:-root}
+      DB_PASSWORD: ${DB_PASSWORD:-${MYSQL_ROOT_PASSWORD:-rootpassword}}
+      DES_ENGINE_URL: http://des-engine:5001
+      JWT_SECRET: ${JWT_SECRET:-docker-local-development-only}
+      CORS_ORIGIN: http://localhost:${APP_PORT:-4001}
+    ports:
+      - "${APP_PORT:-4001}:4000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      des-engine:
+        condition: service_healthy
 
 volumes:
   cafeteria_db_data:

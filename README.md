@@ -11,140 +11,71 @@ staffing changes before making them.
 
 ---
 
-## What runs where
+## Docker stack
 
-XAMPP is Apache + MySQL + PHP. It cannot execute a Node or Python program, so
-it does not run the whole stack by itself. What it provides is the database and
-the web server in front of everything — which is exactly what the report
-describes ("MySQL hosted via XAMPP during development"). Four processes in
-total:
-
-| Process | Port | Started by | What it does |
-|---|---|---|---|
-| Apache (XAMPP) | 80 | XAMPP Control Panel | Serves the built PWA, proxies `/api` and `/socket.io` to Node |
-| MySQL (XAMPP) | 3306 | XAMPP Control Panel | All persistent data |
-| Express API + Socket.io | 4000 | `deploy\start-smart-cafeteria.bat` | REST API, JWT auth, live updates |
-| SimPy DES engine | 5001 | `deploy\start-smart-cafeteria.bat` | Wait-time prediction and what-if simulation |
-
-```
-Browser --80--> Apache --+-- static files (frontend/dist in htdocs)
-                         +--proxy--> Node :4000 --+--> MySQL :3306
-                                                  +--> Python DES :5001
-```
-
-The DES engine is deliberately not exposed through Apache. It has no
-authentication of its own; the role check that keeps simulation away from
-students lives in the Node backend, so the engine stays bound to `127.0.0.1`.
-
----
-
-## Setup (Windows + XAMPP), start to finish
-
-You need XAMPP, [Node.js LTS](https://nodejs.org) and
-[Python 3.10+](https://python.org) (tick **Add python.exe to PATH** during the
-Python installer).
-
-### 1. Database
-
-Start **Apache** and **MySQL** from the XAMPP Control Panel, then open
-<http://localhost/phpmyadmin>.
-
-Go to the **SQL** tab and run, in this order:
-
-1. `database/schema.sql` — creates the database and every table
-2. `database/seed.sql` — demo accounts, menu, and 14 days of history
-
-> Already have a `smart_cafeteria` database from an earlier version? Run
-> `database/migration_2026_10_des.sql` instead of `schema.sql`. It adds the new
-> columns, the `service_events` table and the reporting views without touching
-> your data, and it is safe to run more than once.
-
-Or from a terminal, if `mysql` is on your PATH:
-
-```
-mysql -u root < database\schema.sql
-mysql -u root < database\seed.sql
-```
-
-### 2. Start the API and the simulation engine
-
-Double-click **`deploy\start-smart-cafeteria.bat`**.
-
-On the first run it installs the Node and Python dependencies and creates the
-`.env` files. After that it just starts the two services, each in its own
-window. It checks MySQL is actually listening before it starts anything, so a
-forgotten XAMPP Start gives you one clear message now instead of confusing
-errors later.
-
-Check both are healthy:
-
-- <http://localhost:4000/api/health> — should report `"status": "ok"` with
-  `database.connected: true` and `simulationEngine.available: true`
-- <http://localhost:5001/health>
-
-### 3. Build the frontend and put it in htdocs
-
-```
-cd frontend
-npm install
-npm run build
-xcopy /E /I /Y dist C:\xampp\htdocs\smart-cafeteria
-```
-
-### 4. Configure Apache
-
-Copy `deploy/httpd-smart-cafeteria.conf` into `C:\xampp\apache\conf\extra\`,
-enable the four modules it lists at the top of the file (`proxy`, `proxy_http`,
-`proxy_wstunnel`, `rewrite`) in `C:\xampp\apache\conf\httpd.conf`, add this
-line at the bottom of `httpd.conf`:
-
-```
-Include conf/extra/httpd-smart-cafeteria.conf
-```
-
-and restart Apache from the Control Panel.
-
-### 5. Open it
-
-<http://localhost/smart-cafeteria/>
-
-Demo accounts, all with the password `Password123!`:
-
-| Email | Role | What you see |
+| Service | Host access | Purpose |
 |---|---|---|
-| `student@example.com` | student | Queue banner, menu, pre-ordering, order tracking |
-| `staff@example.com` | staff | Order board, counter open/close |
-| `manager@example.com` | manager | Everything above, plus reports and simulation |
-| `admin@example.com` | admin | Same as manager |
+| `app` | <http://localhost:4001/> | Svelte frontend, Express API, and Socket.io |
+| `mysql` | `127.0.0.1:3307` | Persistent MySQL database |
+| `adminer` | <http://localhost:8081/> | Browser-based database management |
+| `des-engine` | <http://localhost:5002/health> | Wait-time prediction and what-if simulation |
 
----
+## Run the full stack with Docker
 
-## Shortcut: no Apache
+Install and start [Docker Desktop](https://www.docker.com/products/docker-desktop/),
+then run these commands from the project root:
 
-If you only need to demo the app and do not want to configure Apache, the Node
-server serves the built frontend itself:
-
-```
-cd frontend && npm run build
-deploy\start-smart-cafeteria.bat
+```bash
+docker compose up --build
 ```
 
-then open <http://localhost:4000/>. You still need MySQL running from XAMPP.
+Open <http://localhost:4001/>. The frontend is built into the Node image, and
+Compose starts MySQL, the DES engine, and the API in dependency order. Check
+<http://localhost:4001/api/health> for the API and database status. MySQL is
+also available to local database tools at `127.0.0.1:3307`; the DES port is
+internal to Docker.
 
-## Development mode
+To browse the Docker database in Safari, open <http://localhost:8081/>. Sign
+in to Adminer with system `MySQL`, server `mysql`, username `root`, your
+Compose MySQL root password, and database `smart_cafeteria`. Adminer is bound
+to localhost only. Set `ADMINER_PORT` in the root `.env` file to change its
+host port.
 
-Three terminals:
+The app host port defaults to `4001`. Set `APP_PORT` in the root `.env` file
+to choose a different available host port.
 
-```
-cd des-engine && python app.py          # simulation engine, port 5001
-cd backend    && npm run dev            # API with auto-reload, port 4000
-cd frontend   && npm run dev            # Vite dev server, port 5173
-```
+The first MySQL startup runs `database/schema.sql` and `database/seed.sql` and
+stores data in the persistent `cafeteria_db_data` volume. Later starts keep the
+existing database and do not rerun those scripts. Existing database data is
+not overwritten or imported automatically.
 
-Open <http://localhost:5173>. The Vite dev server proxies `/api` and
-`/socket.io` to port 4000, so the frontend uses the same relative URLs in
-development as in production — which is what stops the classic "works in dev,
-404s in the build".
+The default database credentials in Compose (`root` / `rootpassword`) are for
+local development only. For a fresh install, set `MYSQL_ROOT_PASSWORD`,
+`DB_USER`, and `DB_PASSWORD` in a root `.env` file to use a separate app
+account. MySQL creates that account only when initializing an empty volume.
+Changing these values does not update credentials or create users in an
+existing MySQL data directory.
+
+Compose uses a local-only default for `JWT_SECRET` so demo login works without
+loading `backend/.env`. Set a long, random `JWT_SECRET` in the root `.env` file
+before using the app beyond a local demo. The root Compose `.env` and
+`backend/.env` are separate files.
+
+Stop the services with `Ctrl+C`, or run `docker compose down`. The database
+volume is retained. To follow container logs, run `docker compose logs -f`.
+
+The DES engine's host port is bound to localhost only. The Node backend uses
+the internal Compose address and enforces role checks for app simulation
+requests.
+
+Demo accounts use the password `Password123!`: `student@example.com`,
+`staff@example.com`, `manager@example.com`, and `admin@example.com`.
+
+## Docker workflow
+
+Rebuild after code changes with `docker compose up --build -d`; follow output
+with `docker compose logs -f`. Stop containers with `docker compose down`.
+Database data remains in `cafeteria_db_data` when containers stop.
 
 ---
 
@@ -154,9 +85,10 @@ development as in production — which is what stops the classic "works in dev,
 smart-cafeteria-v2/
   backend/      Express REST API + Socket.io       (Node, port 4000)
   des-engine/   SimPy discrete-event simulation    (Python/Flask, port 5001)
-  frontend/     Svelte PWA                         (built to dist/, served by Apache)
-  database/     schema.sql, seed.sql, migration    (MySQL via XAMPP)
-  deploy/       Apache config and start/stop scripts
+  frontend/     Svelte PWA                         (built into the app image)
+  database/     schema.sql, seed.sql, migrations   (initialized by MySQL)
+  Dockerfile    frontend build and Node app image
+  docker-compose.yml  application services
 ```
 
 Each folder has its own README with the detail.
@@ -196,32 +128,15 @@ standing in the cafeteria with a stopwatch again.
 
 ## Troubleshooting
 
-**Blank white page at `/smart-cafeteria/`**
-The frontend was built for the wrong base path. Rebuild with
-`VITE_BASE_PATH=/smart-cafeteria/` in `frontend/.env` and copy `dist` over
-again. Check the browser dev tools Network tab: 404s on `/assets/...` confirm
-it.
+**API or database is unavailable:** run `docker compose ps` and
+`docker compose logs -f app mysql des-engine`.
 
-**"Unexpected token '<' in JSON"**
-Apache is serving the API path as static files. The two `ProxyPass` lines must
-come before the `Alias` in `httpd-smart-cafeteria.conf`, and `mod_proxy` and
-`mod_proxy_http` must be enabled.
+**Cannot open MySQL in Safari:** MySQL's port `3307` is not a web page. Use
+Adminer at <http://localhost:8081/>; sign in with server `mysql`, system
+`MySQL`, and your configured database credentials.
 
-**Live updates work for a few seconds after each page load, then stop**
-`mod_proxy_wstunnel` is not enabled, so the WebSocket upgrade fails. Uncomment
-it in `httpd.conf` and restart Apache.
-
-**"Cannot reach MySQL... press Start next to MySQL"**
-Exactly what it says. If MySQL will not start, another program is usually on
-port 3306 — often a previously installed MySQL service.
-
-**`/api/simulations` returns 503**
-The DES engine is not running. `cd des-engine && python app.py`, and check
-<http://localhost:5001/health>. The rest of the app keeps working without it.
-
-**Refreshing on any page but the home screen gives 404**
-The `mod_rewrite` SPA fallback is not active. Check `AllowOverride All` and
-that `rewrite_module` is enabled.
+**`/api/simulations` returns 503:** check that the `des-engine` service is
+healthy with `docker compose ps` and inspect its logs.
 
 ---
 

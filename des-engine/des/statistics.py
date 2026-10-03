@@ -10,8 +10,8 @@ intervals, using the method of independent replications (Law, *Simulation
 Modeling and Analysis*, ch. 9).
 
 Deliberately dependency-free: numpy/scipy are not installed by the
-requirements file, because the marking environment is a student laptop
-running XAMPP and the fewer wheels that have to compile, the better.
+requirements file, keeping the engine image small and avoiding compiled
+packages.
 """
 
 from __future__ import annotations

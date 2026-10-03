@@ -26,10 +26,10 @@ const app = express();
 const server = http.createServer(app);
 
 // ---------------------------------------------------------------------------
-// Behind XAMPP's Apache
+// Reverse proxy support
 // ---------------------------------------------------------------------------
-// In the XAMPP deployment Apache serves the built PWA on port 80 and reverse
-// proxies /api and /socket.io through to this process. Without trust proxy,
+// A reverse proxy may serve the built PWA and proxy /api and /socket.io to this
+// process. Without trust proxy,
 // every request appears to come from 127.0.0.1, which makes the access log
 // useless and would break any future rate limiting.
 app.set('trust proxy', Number(process.env.TRUST_PROXY_HOPS || 1));
@@ -37,8 +37,8 @@ app.set('trust proxy', Number(process.env.TRUST_PROXY_HOPS || 1));
 // ---------------------------------------------------------------------------
 // CORS
 // ---------------------------------------------------------------------------
-// Two origins are normal here, not one: http://localhost during Apache-served
-// use, and http://localhost:5173 while running the Vite dev server. A single
+// Two origins are normal here, not one: the app origin and the Vite dev server.
+// A single
 // CORS_ORIGIN forces a developer to edit .env every time they switch, and the
 // usual "fix" for that is '*', which is worse. So a comma-separated allow-list.
 const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost,http://localhost:5173')
@@ -63,10 +63,8 @@ const corsOptions = {
 // ---------------------------------------------------------------------------
 const io = new Server(server, {
   cors: { origin: allowedOrigins, credentials: true },
-  // Apache's mod_proxy_wstunnel handles the WebSocket upgrade, but if it has
-  // not been enabled the client must still work. Keeping polling in the
-  // transport list means a misconfigured Apache degrades to slower live
-  // updates instead of no live updates.
+  // Keeping polling in the transport list lets live updates degrade gracefully
+  // if a proxy does not support WebSocket upgrades.
   transports: ['websocket', 'polling'],
   pingTimeout: 20000,
 });
@@ -96,9 +94,7 @@ app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 // ---------------------------------------------------------------------------
 // Health
 // ---------------------------------------------------------------------------
-// Reports on both dependencies rather than just answering "ok". The two ways
-// this app fails on a fresh machine are "XAMPP's MySQL isn't started" and
-// "nobody started the DES engine", and this endpoint names which.
+// Reports on both dependencies rather than just answering "ok".
 app.get('/api/health', async (req, res) => {
   const [database, engine] = await Promise.all([
     pool.verifyConnection(),
@@ -137,10 +133,8 @@ app.use('/api/reports', reportRoutes);
 // ---------------------------------------------------------------------------
 // Serving the built PWA
 // ---------------------------------------------------------------------------
-// Optional. In the documented XAMPP setup Apache serves frontend/dist from
-// htdocs, and this block never runs. It exists so that the whole application
-// can also be demonstrated from a single `npm start` on a machine where Apache
-// has not been configured — which is what you want five minutes before a viva.
+// The production image copies the built frontend here so Node can serve the
+// complete application from one origin.
 const frontendDist = path.resolve(__dirname, '..', 'frontend', 'dist');
 
 // The build's asset URLs are absolute and baked in at build time by Vite's
@@ -221,10 +215,8 @@ async function start() {
 // ---------------------------------------------------------------------------
 // Graceful shutdown
 // ---------------------------------------------------------------------------
-// Ctrl+C during development, and the taskkill in deploy/stop-smart-cafeteria.bat,
-// both land here. Closing the pool explicitly stops MySQL logging an aborted
-// connection every time the server restarts, which otherwise fills XAMPP's
-// error log with noise that looks like a real problem.
+// Ctrl+C during development and Docker's SIGTERM both land here. Closing the
+// pool explicitly stops MySQL logging an aborted connection during shutdown.
 let shuttingDown = false;
 
 async function shutdown(signal) {

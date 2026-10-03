@@ -192,9 +192,8 @@
     <!-- NFR-09: degrade with an instruction, not a stack trace. -->
     <p class="error-text">{engine.message}</p>
     <p class="muted small">
-      Start it from the project root: <code>cd des-engine</code> then
-      <code>python app.py</code> — or run <code>deploy/start-smart-cafeteria.bat</code>,
-      which starts the API and the engine together. Everything else on this page
+      Start it from the project root with
+      <code>docker compose up -d des-engine</code>. Everything else on this page
       keeps working without it.
     </p>
     <button type="button" on:click={checkEngine}>Check again</button>

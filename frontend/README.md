@@ -3,37 +3,12 @@
 Svelte + Vite single-page PWA for the Smart Cafeteria & Resource Queue
 Optimizer.
 
-## Setup
+## Docker
 
-```
-npm install
-cp .env.example .env     # copy .env.example .env  on Windows
-npm run dev              # http://localhost:5173
-```
-
-The dev server proxies `/api` and `/socket.io` to `http://localhost:4000`, so
-the app uses the **same relative URLs in development as in production**. That
-matters more than it sounds: with two different API base URLs and a conditional
-you get the classic "works in dev, 404s in the build", and you only find out
-after deploying.
-
-## Building for XAMPP
-
-```
-npm run build
-xcopy /E /I /Y dist C:\xampp\htdocs\smart-cafeteria
-```
-
-`VITE_BASE_PATH` in `.env` **must** match the folder under `htdocs`. Vite bakes
-asset URLs in at build time, so a bundle built for `/` and served from
-`/smart-cafeteria/` loads a blank white page with 404s on every asset. The
-default in `.env.example` is `/smart-cafeteria/`.
-
-Leave `VITE_API_BASE` and `VITE_SOCKET_URL` **empty**. The app then calls
-`/api` and `/socket.io` on its own origin, which Apache proxies to Node. This
-is what lets the same build work on `localhost` and from a phone on the campus
-network without being rebuilt — an absolute `http://localhost:4000` would point
-the phone at itself.
+The frontend is built into the app image by the root `Dockerfile`. From the
+project root, run `docker compose up --build -d`; open <http://localhost:4001/>.
+The Vite development proxy remains configured for optional frontend-only work,
+but Docker Compose is the supported way to run the application stack.
 
 ## What's here
 

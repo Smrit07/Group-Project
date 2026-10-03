@@ -14,8 +14,7 @@ USE smart_cafeteria;
 -- readings in a viva.  Delete from the "PART 2" banner downwards for a clean
 -- database, or set DES_USE_DB_CALIBRATION=false to have the DES engine ignore it.
 --
--- Statements are batched in groups of 100 rows so phpMyAdmin's import does not
--- time out on a single enormous INSERT.
+-- Statements are batched in groups of 100 rows to keep each insert manageable.
 -- ===========================================================================
 
 -- ---------------------------------------------------------------------------

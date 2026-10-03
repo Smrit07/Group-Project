@@ -19,7 +19,7 @@ POST /calibration/refresh  force a refit from MySQL
 
 Run it with:
     python app.py                     (development)
-    waitress-serve --port=5001 app:app  (Windows / XAMPP, see README)
+    waitress-serve --port=5001 app:app
 """
 
 from __future__ import annotations
@@ -69,9 +69,8 @@ def create_app() -> Flask:
         if request.method == "OPTIONS" or request.path == "/health":
             return None
 
-        # Optional shared secret. Unset in local XAMPP development, where the
-        # engine binds to 127.0.0.1 and is unreachable from the network; set
-        # it if the engine is ever moved to a separate host.
+        # Optional shared secret for deployments where the engine is reachable
+        # outside the private application network.
         if settings.api_key:
             provided = request.headers.get("X-DES-Key")
             if provided != settings.api_key:

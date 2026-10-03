@@ -13,22 +13,14 @@ start-up and a SimPy import every time; and it can be restarted independently
 while the rest of the app keeps serving, which is what makes the graceful
 degradation in NFR-09 meaningful rather than theoretical.
 
-## Running it
+## Docker deployment
 
-```
-pip install -r requirements.txt
-python app.py
-```
+From the project root, run `docker compose up --build -d` to start the engine
+with the API and MySQL. Check its status at <http://localhost:4001/api/health>.
 
-Then <http://localhost:5001/health>.
-
-`python app.py` uses [waitress](https://pypi.org/project/waitress/) if it is
-installed — a production WSGI server that, unlike gunicorn, actually works on
-Windows. It falls back to Flask's development server so a bare clone still
-runs.
-
-Configuration is in `.env` (copy `.env.example`). Every parameter has a
-documented default, so an empty `.env` still works.
+Configuration is supplied to the container through Docker Compose. Model
+parameters can be overridden in the root `.env` file and added to the
+`des-engine` service environment in `docker-compose.yml`.
 
 ## The model
 
@@ -115,7 +107,7 @@ des/engine.py           orchestration, caching, verdict generation
 ```
 
 `des/statistics.py` is deliberately dependency-free — no numpy or scipy — so
-there are no wheels to compile on a student laptop running XAMPP.
+the engine image stays small and avoids compiled numerical packages.
 
 ## Reproducibility
 

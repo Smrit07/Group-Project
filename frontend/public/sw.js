@@ -19,9 +19,8 @@ const VERSION = 'v2';
 const SHELL_CACHE = `smart-cafeteria-shell-${VERSION}`;
 const ASSET_CACHE = `smart-cafeteria-assets-${VERSION}`;
 
-// Scope-relative, not absolute. The app may be served from a htdocs
-// subdirectory (/smart-cafeteria/), where an absolute '/' would cache the
-// wrong page — or fail to cache at all and silently disable offline support.
+// Scope-relative so the worker caches the correct page if the app is served
+// below the web root.
 const SCOPE = new URL(self.registration.scope).pathname;
 const APP_SHELL = [SCOPE, `${SCOPE}index.html`, `${SCOPE}manifest.webmanifest`];
 

@@ -5,8 +5,8 @@
 -- the original schema.sql.  A fresh install should just run schema.sql, which
 -- already contains everything below.
 --
--- In phpMyAdmin: select the smart_cafeteria database, open the SQL tab, paste
--- this file, click Go.  It is safe to run more than once.
+-- Run this file against the existing smart_cafeteria database with a MySQL
+-- client or Adminer. It is safe to run more than once.
 --
 -- Why this migration exists
 -- -------------------------

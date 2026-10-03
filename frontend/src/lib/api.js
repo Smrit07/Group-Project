@@ -1,12 +1,9 @@
 // ---------------------------------------------------------------------------
 // Fetch wrapper for the REST API.
 // ---------------------------------------------------------------------------
-// The default base is '/api' — relative, not absolute. That matters: in the
-// XAMPP deployment Apache serves this app and proxies /api to Node on the same
-// origin, so a hard-coded http://localhost:4000 would break the moment the app
-// is opened from a phone on the campus network (where "localhost" is the
-// phone). Relative URLs follow whatever host the page was loaded from, which
-// is always the right answer.
+// The default base is '/api' — relative, not absolute. The app and API share
+// an origin in the Docker deployment, so relative URLs also work from phones
+// on the same network without pointing back to the phone's own localhost.
 //
 // VITE_API_BASE still overrides it, for the case where the API genuinely lives
 // on another origin.

@@ -3,7 +3,7 @@ import { writable } from 'svelte/store';
 
 // Same reasoning as api.js: default to the page's own origin so the app works
 // unchanged from a phone on the campus network, where "localhost" would point
-// at the phone itself. Apache proxies /socket.io through to Node.
+// at the phone itself. The app and API share an origin in the Docker setup.
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || undefined;
 const SOCKET_PATH = import.meta.env.BASE_URL + 'socket.io';
 
@@ -21,9 +21,8 @@ export function getSocket() {
 
   socket = io(SOCKET_URL, {
     autoConnect: true,
-    // Apache needs mod_proxy_wstunnel enabled for a true WebSocket. If it is
-    // not, this falls back to long polling rather than failing outright —
-    // slower live updates instead of none.
+    // Long polling remains available as a fallback if a proxy cannot upgrade
+    // the connection to WebSocket.
     transports: ['websocket', 'polling'],
     reconnection: true,
     reconnectionDelay: 1000,

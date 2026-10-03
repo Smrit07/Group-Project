@@ -65,11 +65,8 @@ def _env_multipliers(key: str, default: tuple[float, ...]) -> tuple[float, ...]:
 @dataclass(frozen=True)
 class DatabaseSettings:
     """
-    Connection details for XAMPP's MySQL. Note the default user/password:
-    XAMPP ships with root and an empty password, and the calibration reader
-    only ever issues SELECTs, so it is given the same credentials as the
-    Node backend rather than a second account the student has to remember
-    to create.
+    MySQL connection details. The calibration reader only issues SELECTs, so
+    it uses the same database credentials as the Node backend.
     """
 
     host: str = field(default_factory=lambda: os.getenv("DB_HOST", "127.0.0.1"))
@@ -179,8 +176,7 @@ class EngineSettings:
     model: ModelDefaults = field(default_factory=ModelDefaults)
 
     # Optional shared secret. If set, the Node backend must send it as
-    # X-DES-Key. Left unset for local XAMPP development, where the engine is
-    # bound to 127.0.0.1 anyway and is not reachable from the campus network.
+    # X-DES-Key.
     api_key: Optional[str] = field(default_factory=lambda: os.getenv("DES_API_KEY") or None)
 
 

@@ -140,9 +140,7 @@ async function runSimulation(req, res, next) {
         }
         return res.status(503).json({
           message: err.message,
-          hint:
-            'Start the simulation engine: open a terminal in des-engine/ and run ' +
-            '"python app.py" (or use deploy/start-smart-cafeteria.bat, which starts it for you).',
+          hint: 'Start the simulation engine with: docker compose up -d des-engine',
           engine: desClient.status(),
         });
       }

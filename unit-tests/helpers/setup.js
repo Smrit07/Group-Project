@@ -3,7 +3,7 @@
  * Shared test helpers.
  *
  * The goal: run the REAL backend code (controllers, middleware, desClient,
- * waitTimeEstimator) without needing MySQL/XAMPP, the Python engine, or a
+ * waitTimeEstimator) without needing MySQL, the Python engine, or a
  * running server. Only the two outside dependencies are replaced:
  *
  *   1. The MySQL pool  -> an in-memory fake (createFakeDb / useFakeDb)

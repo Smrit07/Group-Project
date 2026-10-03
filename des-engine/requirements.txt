@@ -1,6 +1,6 @@
 # Smart Cafeteria — DES engine
 # Install with:  pip install -r requirements.txt
-# Tested on Python 3.10 – 3.12 (Windows/XAMPP and Linux).
+# Tested on Python 3.10 – 3.12.
 
 simpy==4.1.1          # discrete-event simulation kernel (proposal s.2.2.1)
 Flask==3.0.3          # REST bridge the Express backend calls

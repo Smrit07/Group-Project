@@ -4,7 +4,7 @@ Automated tests for the **Smart Cafeteria & Resource Queue Optimizer**.
 Every row of *Table 7.1 Unit test results* in the group report is implemented here, and each test
 name starts with its ID (`UT-05 placeOrder: ...`) so the output lines up with the report.
 
-**No MySQL, XAMPP, browser or running server is needed.** The tests run the *real* backend code;
+**No MySQL, browser or running server is needed.** The tests run the *real* backend code;
 only the database and the Python engine are replaced with fakes.
 
 ---

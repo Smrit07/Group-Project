@@ -8,25 +8,18 @@ REST + WebSocket API for the Smart Cafeteria & Resource Queue Optimizer (CSY2088
 - MySQL via `mysql2/promise` (connection pool)
 - JWT (`jsonwebtoken`) for auth, `bcryptjs` for password hashing
 
-## Setup
+## Run with Docker
 
-1. Start MySQL (via XAMPP Control Panel).
-2. Create the database and tables:
-   ```
-   mysql -u root -p < ../database/schema.sql
-   mysql -u root -p < ../database/seed.sql
-   ```
-3. Copy `.env.example` to `.env` and fill in your DB credentials and a JWT secret.
-4. Install dependencies and run:
-   ```
-   npm install
-   npm run dev
-   ```
-5. Check it's alive: `GET http://localhost:4000/api/health`
+From the project root, start the full stack with `docker compose up --build -d`.
+The frontend and backend are served together at <http://localhost:4001/>.
+Check `http://localhost:4001/api/health` for API, database, and DES status.
+
+The Compose file injects the container's database and JWT settings. The
+backend's `.env.example` is only for running this service directly on the host.
 
    The health response reports on **both** dependencies, not just itself. The
-   two ways this app fails on a fresh machine are "XAMPP's MySQL isn't started"
-   and "nobody started the DES engine", and this endpoint names which:
+  the common dependency failures are an unavailable MySQL or DES service, and
+  this endpoint reports which one:
 
    ```json
    {

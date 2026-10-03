@@ -1,7 +1,7 @@
 # Database
 
-MySQL 8 (or MariaDB 10.4+, which is what XAMPP actually ships). All three files
-run from phpMyAdmin's SQL tab or the `mysql` client.
+MySQL 8 runs in Docker Compose. On the first start, Compose initializes an empty
+database volume from `schema.sql` and `seed.sql` automatically.
 
 ## Which file to run
 
@@ -13,18 +13,14 @@ run from phpMyAdmin's SQL tab or the `mysql` client.
    history.
 
 **Upgrading an existing database** built from an earlier version of
-`schema.sql` — run `migration_2026_10_des.sql` instead. It adds the new columns,
+`schema.sql` — run `not-for-docker-init/migration_2026_10_des.sql` instead. It adds the new columns,
 the `service_events` table and the views without touching your data, and it is
 safe to run more than once (each change is guarded by an
 `information_schema` check).
 
-```
-mysql -u root < schema.sql
-mysql -u root < seed.sql
-```
-
-XAMPP's default is user `root` with an empty password, so no `-p` is needed
-unless you set one.
+Use Adminer at <http://localhost:8081/> to inspect or update the Docker
+database. The Docker workflow and database credentials are documented in the
+project-root README.
 
 ## Tables
 
