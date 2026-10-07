@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Unit test results</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #fff; color: #1f2933; font: 14px/1.5 -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 28px 24px 40px; }
+    h1 { font-size: 22px; margin: 0 0 2px; }
+    .sub { color: #5f6b76; margin: 0 0 18px; }
+    .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 22px; }
+    .card { border: 1px solid #d9dee3; border-radius: 8px; padding: 12px 14px; }
+    .card b { display: block; font-size: 26px; line-height: 1.1; color: #0f6e3a; }
+    .card.bad b { color: #b42318; }
+    .card span { color: #5f6b76; font-size: 12px; }
+    h2 { font-size: 16px; margin: 26px 0 4px; padding-bottom: 6px; border-bottom: 2px solid #1f2933; display: flex; justify-content: space-between; align-items: baseline; }
+    h2 small { font-weight: 400; color: #5f6b76; font-size: 12px; }
+    .grp { margin: 14px 0 0; break-inside: avoid; }
+    .gh { display: flex; gap: 8px; align-items: center; background: #f3f5f7; border: 1px solid #d9dee3; border-radius: 6px 6px 0 0; padding: 6px 10px; font-weight: 600; font-size: 13px; }
+    .id { background: #1f2933; color: #fff; border-radius: 4px; padding: 0 6px; font-size: 11px; }
+    .cnt { margin-left: auto; color: #0f6e3a; font-weight: 600; font-size: 12px; }
+    .cnt.bad { color: #b42318; }
+    .row { display: flex; gap: 8px; padding: 5px 10px; border: 1px solid #d9dee3; border-top: 0; font-size: 13px; }
+    .row:last-child { border-radius: 0 0 6px 6px; }
+    .ok { color: #0f6e3a; font-weight: 700; }
+    .no { color: #b42318; font-weight: 700; }
+    .err { color: #b42318; }
+    .ms { margin-left: auto; color: #8a949e; font-size: 12px; white-space: nowrap; }
+    .btn { margin-top: 20px; padding: 8px 14px; border: 1px solid #1f2933; background: #fff; border-radius: 6px; cursor: pointer; font: inherit; }
+    @media (max-width: 640px) { .cards { grid-template-columns: repeat(2, 1fr); } }
+    @media print { .btn { display: none; } .wrap { padding: 0; } body { font-size: 12px; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Unit test results</h1>
+    <p class="sub">Smart Cafeteria &amp; Resource Queue Optimizer &middot; generated 10/7/2026, 3:36:10 PM</p>
+
+    <div class="cards">
+      <div class="card "><b>87 / 87</b><span>Node tests passed</span></div>
+      <div class="card "><b>16 / 16</b><span>Python tests passed</span></div>
+      <div class="card"><b>103</b><span>Total tests</span></div>
+      <div class="card "><b>0</b><span>Failed</span></div>
+    </div>
+
+    <h2>Node tests (UT-01 to UT-12) <small>duration 616 ms</small></h2>
+    
+    <div class="grp">
+      <div class="gh"><span class="id">DES client</span>Circuit breaker and timeout (desClient.js)<span class="cnt ">9/9 passed</span></div>
+      
+      <div class="row"><span class="ok">&#10003;</span><span>breaker: stays closed for the first 2 failures, opens on the 3rd</span><span class="ms">2236.46 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>breaker: while open, calls fail instantly WITHOUT contacting the engine</span><span class="ms">650.13 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>breaker: half-opens after the cooldown and closes again on success</span><span class="ms">121929.17 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>breaker: a success in between resets the failure count</span><span class="ms">430.54 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>breaker: a parameter error (HTTP 400) is NOT an outage and never opens the breaker</span><span class="ms">293.75 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>breaker: a server error (HTTP 500) counts as unavailable</span><span class="ms">112.67 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>timeout: a stalled engine is reported as &quot;did not respond within 1500ms&quot;</span><span class="ms">121458.63 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>request: sends JSON to /estimate with the API key header and a timeout signal</span><span class="ms">121020.42 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>health: reports available=true / available=false and never throws</span><span class="ms">271.83 ms</span></div>
+    </div>
+
+    <div class="grp">
+      <div class="gh"><span class="id">UT-01</span>Test group<span class="cnt ">4/4 passed</span></div>
+      
+      <div class="row"><span class="ok">&#10003;</span><span>UT-01 login: each of the 4 roles gets its own role back (body + JWT)</span><span class="ms">11608.25 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-01 login: response never leaks the password hash</span><span class="ms">2171.04 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-01 login: wrong password and unknown email give the same 401 (no account enumeration)</span><span class="ms">1930.92 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-01 login: missing email or password -&gt; 400</span><span class="ms">147.13 ms</span></div>
+    </div>
+
+    <div class="grp">
+      <div class="gh"><span class="id">UT-02</span>Test group<span class="cnt ">12/12 passed</span></div>
+      
+      <div class="row"><span class="ok">&#10003;</span><span>UT-02 checkRole: student token on a staff endpoint -&gt; 403 permission error</span><span class="ms">4374.25 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-02 checkRole: staff, manager and admin tokens ARE allowed on a staff endpoint</span><span class="ms">857.63 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-02 checkRole: staff token on a manager-only endpoint -&gt; 403</span><span class="ms">295.67 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-02 requireAuth: no Authorization header -&gt; 401</span><span class="ms">88.67 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-02 requireAuth: wrong scheme (not &quot;Bearer&quot;) -&gt; 401</span><span class="ms">800.79 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-02 requireAuth: token signed with a different secret (forged) -&gt; 401</span><span class="ms">507.67 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-02 requireAuth: expired token -&gt; 401</span><span class="ms">347.29 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-02 requireAuth: tampered payload (role edited to admin) -&gt; 401</span><span class="ms">379.04 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-02 sweep: every route is either deliberately public or requires a valid token</span><span class="ms">69769.00 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-02 sweep: a student token is rejected (403) on every route except the student ones</span><span class="ms">1906.88 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-02 sweep: student-only routes (placing/viewing own orders) reject staff, manager and admin</span><span class="ms">684.13 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-02 sanity: tokens issued by the app carry the role claim the middleware reads</span><span class="ms">137.13 ms</span></div>
+    </div>
+
+    <div class="grp">
+      <div class="gh"><span class="id">UT-03</span>Test group<span class="cnt ">4/4 passed</span></div>
+      
+      <div class="row"><span class="ok">&#10003;</span><span>UT-03 getQueueLength: 3 orders in received/preparing -&gt; queue length = 3</span><span class="ms">11147.92 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-03 getQueueLength: ready / completed / cancelled orders are NOT counted as queueing</span><span class="ms">451.46 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-03 getQueueLength: empty cafeteria -&gt; 0</span><span class="ms">194.96 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-03 getQueueLength: counts open counters and staff on duty alongside the queue</span><span class="ms">150.83 ms</span></div>
+    </div>
+
+    <div class="grp">
+      <div class="gh"><span class="id">UT-04</span>Test group<span class="cnt ">6/6 passed</span></div>
+      
+      <div class="row"><span class="ok">&#10003;</span><span>UT-04 estimateWait: queue=6, counters=2, avg service 2.5 min -&gt; 7.5 min</span><span class="ms">220.13 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-04 estimateWait: scales with queue and counters, rounded to 1 decimal</span><span class="ms">193.63 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-04 estimateWait: more open counters never makes the wait longer</span><span class="ms">115.63 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-04 estimateWait: no open counters -&gt; null (cannot estimate), not Infinity/NaN</span><span class="ms">158.33 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-04 estimateWait: the API labels the figure as an estimate (FR-04) - DES engine available</span><span class="ms">1378.00 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-04 estimateWait: engine down, queue=6 counters=2 -&gt; 7.5 min, labelled as an estimate</span><span class="ms">929.00 ms</span></div>
+    </div>
+
+    <div class="grp">
+      <div class="gh"><span class="id">UT-05</span>Test group<span class="cnt ">10/10 passed</span></div>
+      
+      <div class="row"><span class="ok">&#10003;</span><span>UT-05 placeOrder: valid items -&gt; status &quot;received&quot; plus a pickup estimate (engine down, fallback formula)</span><span class="ms">3488.58 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-05 placeOrder: pickup estimate comes from the DES engine when it is available</span><span class="ms">835.92 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-05 placeOrder: total is calculated from DATABASE prices, never from the client</span><span class="ms">234.00 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-05 placeOrder: committed in one transaction and the staff board is notified live (NFR-04)</span><span class="ms">1227.33 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-05 placeOrder: duplicate lines for the same item are merged into one line</span><span class="ms">1122.33 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-05 placeOrder: no counters open -&gt; order still accepted, but no pickup time is invented</span><span class="ms">260.21 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-05 placeOrder: rejects bad input with 400 before touching the database</span><span class="ms">1712.33 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-05 placeOrder: sold-out item -&gt; 409, rolled back, nothing inserted</span><span class="ms">152.75 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-05 placeOrder: unknown menu item -&gt; 400 and rolled back</span><span class="ms">86.46 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-05 placeOrder: database failure -&gt; rolled back, connection released, generic 500 (no SQL leaked)</span><span class="ms">1713.88 ms</span></div>
+    </div>
+
+    <div class="grp">
+      <div class="gh"><span class="id">UT-06</span>Test group<span class="cnt ">7/7 passed</span></div>
+      
+      <div class="row"><span class="ok">&#10003;</span><span>UT-06 updateOrderStatus: received -&gt; preparing updates the status and sets preparing_at</span><span class="ms">628.96 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-06 updateOrderStatus: broadcasts the change with the student id so &quot;ready&quot; notifies them (FR-08)</span><span class="ms">139.50 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-06 updateOrderStatus: each step stamps its own timestamp column</span><span class="ms">557.04 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-06 updateOrderStatus: completing an order records a service_events calibration row</span><span class="ms">137.17 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-06 updateOrderStatus: a counter can be assigned while advancing</span><span class="ms">109.29 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-06 updateOrderStatus: setting the status it already has is a harmless no-op</span><span class="ms">116.46 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-06 updateOrderStatus: received -&gt; cancelled and preparing -&gt; cancelled are allowed</span><span class="ms">159.13 ms</span></div>
+    </div>
+
+    <div class="grp">
+      <div class="gh"><span class="id">UT-07</span>Test group<span class="cnt ">4/4 passed</span></div>
+      
+      <div class="row"><span class="ok">&#10003;</span><span>UT-07 updateOrderStatus: completed -&gt; preparing is rejected (409) by the state machine</span><span class="ms">102.96 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-07 updateOrderStatus: the full 5x5 transition matrix behaves exactly as specified</span><span class="ms">433.42 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-07 updateOrderStatus: finished orders list no next step in the error message</span><span class="ms">83.88 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-07 updateOrderStatus: invalid input -&gt; 400 / 404 and nothing is written</span><span class="ms">91.08 ms</span></div>
+    </div>
+
+    <div class="grp">
+      <div class="gh"><span class="id">UT-08</span>Test group<span class="cnt ">6/6 passed</span></div>
+      
+      <div class="row"><span class="ok">&#10003;</span><span>UT-08 toggleCounter: closing counter 2 writes is_open = false for counter 2 only</span><span class="ms">755.21 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-08 toggleCounter: change is broadcast to all connected screens (counters:updated)</span><span class="ms">1092.04 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-08 toggleCounter: reopening a counter and assigning a staff member</span><span class="ms">142.54 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-08 toggleCounter: unknown counter -&gt; 404 and nothing is broadcast</span><span class="ms">352.67 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-08 toggleCounter: missing isOpen -&gt; 400 and the database is not touched</span><span class="ms">94.79 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-08 listCounters: returns every counter with its open/closed state (FR-05)</span><span class="ms">264.63 ms</span></div>
+    </div>
+
+    <div class="grp">
+      <div class="gh"><span class="id">UT-09</span>Test group<span class="cnt ">9/9 passed</span></div>
+      
+      <div class="row"><span class="ok">&#10003;</span><span>UT-09 runScenario: 2 counters and 3 counters both return avg wait + confidence interval</span><span class="ms">2771.75 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-09 runScenario: forwards validated numbers to the engine and stores the scenario</span><span class="ms">935.17 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-09 runScenario: results keep the &quot;estimate, not a promise&quot; disclaimer (FR-04)</span><span class="ms">255.67 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-09 runScenario: invalid forms are rejected with 400 and never reach the engine</span><span class="ms">738.21 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-09 runScenario: engine switched off -&gt; 503 with a hint, nothing stored</span><span class="ms">393.63 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-09 runScenario: engine rejects the parameters (HTTP 400) -&gt; 400, not 503</span><span class="ms">1189.75 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-09 compareScenarios: needs between 2 and 6 scenarios</span><span class="ms">160.79 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-09 compareScenarios: 2 counters vs 3 counters is sent to the engine and its answer returned</span><span class="ms">228.25 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-09 compareScenarios: engine down -&gt; 503</span><span class="ms">144.17 ms</span></div>
+    </div>
+
+    <div class="grp">
+      <div class="gh"><span class="id">UT-10</span>Test group<span class="cnt ">7/7 passed</span></div>
+      
+      <div class="row"><span class="ok">&#10003;</span><span>UT-10 getReport: admin gets summarised figures</span><span class="ms">1397.67 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-10 getReport: response contains no personal data (no student ids, names or emails)</span><span class="ms">226.08 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-10 getReport: the SQL never reads student identities (aggregates only)</span><span class="ms">296.96 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-10 getReport: supports daily / weekly / monthly / semester periods (FR-14)</span><span class="ms">305.50 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-10 getReport: unknown or missing period falls back to weekly</span><span class="ms">170.13 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-10 getReport: period value is passed as a bound parameter, not pasted into SQL (no injection)</span><span class="ms">324.29 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-10 getReport: the route allows admin and manager but blocks students and staff</span><span class="ms">3052.92 ms</span></div>
+    </div>
+
+    <div class="grp">
+      <div class="gh"><span class="id">UT-11</span>Test group<span class="cnt ">5/5 passed</span></div>
+      
+      <div class="row"><span class="ok">&#10003;</span><span>UT-11 fallbackEstimate: engine stopped -&gt; request still succeeds and queue length is shown</span><span class="ms">1888.83 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-11 fallbackEstimate: result is labelled approximate (source, low confidence, explanatory note)</span><span class="ms">377.83 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-11 fallbackEstimate: no counters open -&gt; wait is null but queue length is still shown</span><span class="ms">185.58 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-11 fallbackEstimate: engine returns HTTP 500 -&gt; same graceful fallback</span><span class="ms">191.54 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-11 fallbackEstimate: engine times out -&gt; same graceful fallback</span><span class="ms">902.71 ms</span></div>
+    </div>
+
+    <div class="grp">
+      <div class="gh"><span class="id">UT-12</span>Test group<span class="cnt ">4/4 passed</span></div>
+      
+      <div class="row"><span class="ok">&#10003;</span><span>UT-12 hashPassword: registration stores a bcrypt hash, never the plain password</span><span class="ms">213319.58 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-12 hashPassword: same password hashed twice gives different hashes (salted)</span><span class="ms">139640.25 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-12 register: response contains no password or hash</span><span class="ms">68708.92 ms</span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>UT-12 register: validation (missing fields 400, bad role 400, duplicate email 409)</span><span class="ms">219.50 ms</span></div>
+    </div>
+
+    <h2>Python tests (SimPy DES engine) <small>Ran 16 tests in 0.074 s</small></h2>
+    
+    <div class="grp">
+      <div class="gh"><span class="id">UT04LiveEstimate</span>Python DES engine<span class="cnt ">2/2 passed</span></div>
+      
+      <div class="row"><span class="ok">&#10003;</span><span>test_estimate_is_labelled_and_complete</span><span class="ms"></span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>test_longer_queue_means_longer_estimate</span><span class="ms"></span></div>
+    </div>
+
+    <div class="grp">
+      <div class="gh"><span class="id">UT09RunScenario</span>Python DES engine<span class="cnt ">10/10 passed</span></div>
+      
+      <div class="row"><span class="ok">&#10003;</span><span>test_an_extra_counter_reduces_the_wait</span><span class="ms"></span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>test_both_scenarios_return_a_95_percent_confidence_interval</span><span class="ms"></span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>test_both_scenarios_return_average_wait</span><span class="ms"></span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>test_invalid_parameters_are_rejected_not_silently_simulated</span><span class="ms"></span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>test_more_arrivals_means_longer_waits</span><span class="ms"></span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>test_other_headline_figures_are_present</span><span class="ms"></span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>test_output_is_labelled_as_an_estimate_FR04</span><span class="ms"></span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>test_p90_wait_is_not_below_the_average</span><span class="ms"></span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>test_results_are_reproducible_with_the_same_seed</span><span class="ms"></span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>test_scenario_echoes_the_counters_that_were_asked_for</span><span class="ms"></span></div>
+    </div>
+
+    <div class="grp">
+      <div class="gh"><span class="id">UT09Statistics</span>Python DES engine<span class="cnt ">4/4 passed</span></div>
+      
+      <div class="row"><span class="ok">&#10003;</span><span>test_critical_values</span><span class="ms"></span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>test_identical_samples_have_a_zero_width_interval</span><span class="ms"></span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>test_more_replications_narrow_the_interval</span><span class="ms"></span></div>
+      <div class="row"><span class="ok">&#10003;</span><span>test_summarise_known_sample</span><span class="ms"></span></div>
+    </div>
+
+    <button class="btn" onclick="window.print()">Print / save as PDF</button>
+  </div>
+</body>
+</html>
